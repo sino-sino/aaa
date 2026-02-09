@@ -46,6 +46,7 @@
     border-radius: 25px;
     font-size: 15px;
     cursor: pointer;
+    user-select: none;
   }
 
   .yes {
@@ -100,7 +101,6 @@
     position: fixed;
     width: 8px;
     height: 8px;
-    background: pink;
     animation: fall 3s linear forwards;
   }
 
@@ -109,6 +109,12 @@
       transform: translateY(100vh) rotate(360deg);
       opacity: 0;
     }
+  }
+
+  /* Slow drift after catching No */
+  @keyframes slowDrift {
+    from { transform: translate(0, 0); }
+    to { transform: translate(var(--dx), var(--dy)); }
   }
 </style>
 </head>
@@ -139,6 +145,8 @@
 </div>
 
 <script>
+  let heartsPaused = false;
+
   function nextStep() {
     step1.classList.add("hidden");
     step2.classList.remove("hidden");
@@ -167,6 +175,7 @@
     noBtn.style.top = "70%";
   }
 
+  // Run away + shake
   noBtn.addEventListener("mouseenter", () => {
     noBtn.classList.add("shake");
     setTimeout(() => noBtn.classList.remove("shake"), 400);
@@ -177,8 +186,27 @@
     noBtn.style.top = y + "%";
   });
 
-  /* Floating hearts */
+  // If she catches it
+  noBtn.addEventListener("click", () => {
+    heartsPaused = true;
+
+    const dx = (Math.random() * 200 - 100) + "px";
+    const dy = (Math.random() * 200 - 100) + "px";
+
+    noBtn.style.setProperty("--dx", dx);
+    noBtn.style.setProperty("--dy", dy);
+    noBtn.style.animation = "slowDrift 2s forwards";
+
+    setTimeout(() => {
+      heartsPaused = false;
+      noBtn.style.animation = "";
+    }, 2500);
+  });
+
+  // Floating hearts
   setInterval(() => {
+    if (heartsPaused) return;
+
     const heart = document.createElement("div");
     heart.className = "heart";
     heart.innerHTML = "💗";
@@ -186,10 +214,11 @@
     heart.style.fontSize = (Math.random() * 10 + 15) + "px";
     heart.style.animationDuration = (Math.random() * 3 + 4) + "s";
     document.body.appendChild(heart);
+
     setTimeout(() => heart.remove(), 6000);
   }, 400);
 
-  /* Confetti function */
+  // Confetti
   function confetti() {
     for (let i = 0; i < 120; i++) {
       const c = document.createElement("div");
@@ -205,3 +234,4 @@
 
 </body>
 </html>
+
