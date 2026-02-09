@@ -23,9 +23,7 @@
     border-radius: 20px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.12);
     text-align: center;
-    max-width: 340px;
-    position: relative;
-    z-index: 2;
+    max-width: 360px;
     animation: fadeIn 1s ease;
   }
 
@@ -46,7 +44,6 @@
     border-radius: 25px;
     font-size: 15px;
     cursor: pointer;
-    user-select: none;
   }
 
   .yes {
@@ -64,57 +61,16 @@
     display: none;
   }
 
+  img {
+    width: 100%;
+    border-radius: 15px;
+    margin-top: 20px;
+    animation: fadeIn 1.5s ease;
+  }
+
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Shake animation */
-  @keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(0); }
-  }
-
-  .shake {
-    animation: shake 0.4s;
-  }
-
-  /* Floating hearts */
-  .heart {
-    position: absolute;
-    bottom: -20px;
-    font-size: 20px;
-    animation: floatUp 6s linear infinite;
-    opacity: 0.7;
-  }
-
-  @keyframes floatUp {
-    from { transform: translateY(0); opacity: 0.7; }
-    to { transform: translateY(-110vh); opacity: 0; }
-  }
-
-  /* Confetti */
-  .confetti {
-    position: fixed;
-    width: 8px;
-    height: 8px;
-    animation: fall 3s linear forwards;
-  }
-
-  @keyframes fall {
-    to {
-      transform: translateY(100vh) rotate(360deg);
-      opacity: 0;
-    }
-  }
-
-  /* Slow drift after catching No */
-  @keyframes slowDrift {
-    from { transform: translate(0, 0); }
-    to { transform: translate(var(--dx), var(--dy)); }
   }
 </style>
 </head>
@@ -135,18 +91,24 @@
   <button class="yes" onclick="finalStep()">Tap here</button>
 </div>
 
-<!-- FINAL -->
+<!-- FINAL QUESTION -->
 <div class="card hidden" id="final">
   <h1>✏️ EDIT THIS</h1>
   <p style="font-size:18px;">✏️ EDIT THIS</p>
-
   <button class="yes" onclick="yesAnswer()">Yes 💕</button>
   <button class="no" id="noBtn">No</button>
 </div>
 
-<script>
-  let heartsPaused = false;
+<!-- YES RESULT -->
+<div class="card hidden" id="yesCard">
+  <h1>💖</h1>
+  <p style="font-size:18px;">✏️ EDIT THIS</p>
 
+  <!-- IMAGE APPEARS ONLY HERE -->
+  <img src="hearts.png" alt="Us">
+</div>
+
+<script>
   function nextStep() {
     step1.classList.add("hidden");
     step2.classList.remove("hidden");
@@ -155,83 +117,22 @@
   function finalStep() {
     step2.classList.add("hidden");
     final.classList.remove("hidden");
-    placeNo();
-  }
-
-  function yesAnswer() {
-    confetti();
-    document.body.innerHTML = `
-      <div class="card">
-        <h1>💖</h1>
-        <p style="font-size:18px;">✏️ EDIT THIS</p>
-      </div>
-    `;
-  }
-
-  const noBtn = document.getElementById("noBtn");
-
-  function placeNo() {
     noBtn.style.left = "55%";
     noBtn.style.top = "70%";
   }
 
-  // Run away + shake
-  noBtn.addEventListener("mouseenter", () => {
-    noBtn.classList.add("shake");
-    setTimeout(() => noBtn.classList.remove("shake"), 400);
-
-    const x = Math.random() * 70;
-    const y = Math.random() * 70;
-    noBtn.style.left = x + "%";
-    noBtn.style.top = y + "%";
-  });
-
-  // If she catches it
-  noBtn.addEventListener("click", () => {
-    heartsPaused = true;
-
-    const dx = (Math.random() * 200 - 100) + "px";
-    const dy = (Math.random() * 200 - 100) + "px";
-
-    noBtn.style.setProperty("--dx", dx);
-    noBtn.style.setProperty("--dy", dy);
-    noBtn.style.animation = "slowDrift 2s forwards";
-
-    setTimeout(() => {
-      heartsPaused = false;
-      noBtn.style.animation = "";
-    }, 2500);
-  });
-
-  // Floating hearts
-  setInterval(() => {
-    if (heartsPaused) return;
-
-    const heart = document.createElement("div");
-    heart.className = "heart";
-    heart.innerHTML = "💗";
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.fontSize = (Math.random() * 10 + 15) + "px";
-    heart.style.animationDuration = (Math.random() * 3 + 4) + "s";
-    document.body.appendChild(heart);
-
-    setTimeout(() => heart.remove(), 6000);
-  }, 400);
-
-  // Confetti
-  function confetti() {
-    for (let i = 0; i < 120; i++) {
-      const c = document.createElement("div");
-      c.className = "confetti";
-      c.style.left = Math.random() * 100 + "vw";
-      c.style.top = "-10px";
-      c.style.background = `hsl(${Math.random()*360}, 80%, 70%)`;
-      document.body.appendChild(c);
-      setTimeout(() => c.remove(), 3000);
-    }
+  function yesAnswer() {
+    final.classList.add("hidden");
+    yesCard.classList.remove("hidden");
   }
+
+  const noBtn = document.getElementById("noBtn");
+
+  noBtn.addEventListener("mouseenter", () => {
+    noBtn.style.left = Math.random() * 70 + "%";
+    noBtn.style.top = Math.random() * 70 + "%";
+  });
 </script>
 
 </body>
 </html>
-
