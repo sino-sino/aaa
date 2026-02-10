@@ -131,74 +131,98 @@ img {
 <audio id="typeSound" src="type.mp3"></audio>
 
 <script>
-/* ===== SAFE GLOBAL FUNCTIONS ===== */
-window.goToQuestion = function () {
-  document.getElementById("step1").classList.add("hidden");
-  document.getElementById("question").classList.remove("hidden");
+/* ========= GLOBAL HELPERS ========= */
+function $(id) {
+  return document.getElementById(id);
+}
 
-  const noBtn = document.getElementById("noBtn");
+/* ========= FLOATING HEARTS ========= */
+setInterval(() => {
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.textContent = "❤";
+  h.style.left = Math.random() * 100 + "vw";
+  h.style.fontSize = Math.random() * 12 + 12 + "px";
+  h.style.animationDuration = Math.random() * 3 + 4 + "s";
+  document.body.appendChild(h);
+  setTimeout(() => h.remove(), 7000);
+}, 400);
+
+/* ========= NAVIGATION ========= */
+window.goToQuestion = function () {
+  $("step1").classList.add("hidden");
+  $("question").classList.remove("hidden");
+
+  const noBtn = $("noBtn");
   noBtn.style.left = "55%";
   noBtn.style.top = "70%";
 };
 
+let audioUnlocked = false;
+
 window.yesAnswer = function () {
-  document.getElementById("question").classList.add("hidden");
-  document.getElementById("yesCard").classList.remove("hidden");
+  $("question").classList.add("hidden");
+  $("yesCard").classList.remove("hidden");
 
-  const bgMusic = document.getElementById("bgMusic");
+  const bgMusic = $("bgMusic");
+  const typeSound = $("typeSound");
 
-  if (bgMusic) {
+  /* 🔓 UNLOCK AUDIO (CRITICAL) */
+  if (!audioUnlocked) {
     bgMusic.volume = 0.7;
     bgMusic.play().catch(() => {});
+    typeSound.play().catch(() => {});
+    typeSound.pause();
+    typeSound.currentTime = 0;
+    audioUnlocked = true;
   }
 
   startTypewriter();
 };
 
+/* ========= NO BUTTON BEHAVIOR ========= */
+/* 70% escape, 30% pause then slight move */
 window.noReaction = function () {
-  const noBtn = document.getElementById("noBtn");
+  const btn = $("noBtn");
 
   if (Math.random() < 0.7) {
-    noBtn.classList.add("shake");
-    setTimeout(() => noBtn.classList.remove("shake"), 400);
+    /* ESCAPE */
+    btn.style.left = Math.random() * 70 + "%";
+    btn.style.top = Math.random() * 70 + "%";
   } else {
-    noBtn.style.left = Math.random() * 70 + "%";
-    noBtn.style.top = Math.random() * 70 + "%";
+    /* TEASE */
+    btn.classList.add("shake");
+
+    setTimeout(() => {
+      btn.classList.remove("shake");
+
+      const dx = (Math.random() * 20 - 10);
+      const dy = (Math.random() * 20 - 10);
+
+      btn.style.left = `calc(${btn.style.left} + ${dx}px)`;
+      btn.style.top = `calc(${btn.style.top} + ${dy}px)`;
+    }, 500);
   }
 };
 
-/* ===== FLOATING HEARTS ===== */
-setInterval(() => {
-  const heart = document.createElement("div");
-  heart.className = "heart";
-  heart.textContent = "❤";
-  heart.style.left = Math.random() * 100 + "vw";
-  heart.style.fontSize = Math.random() * 12 + 12 + "px";
-  heart.style.animationDuration = Math.random() * 3 + 4 + "s";
-  document.body.appendChild(heart);
-  setTimeout(() => heart.remove(), 7000);
-}, 400);
-
-/* ===== TYPEWRITER ===== */
-const message = "✏️ EDIT THIS — something real.";
+/* ========= TYPEWRITER ========= */
+const message = "✏️ EDIT THIS — write something honest.";
 
 function startTypewriter() {
-  const el = document.getElementById("typewriter");
-  const typeSound = document.getElementById("typeSound");
-  const bgMusic = document.getElementById("bgMusic");
+  const el = $("typewriter");
+  const typeSound = $("typeSound");
+  const bgMusic = $("bgMusic");
 
   let i = 0;
-
   fadeOutMusic();
 
   function type() {
     if (i < message.length) {
       el.textContent += message.charAt(i);
 
-      if (typeSound) {
-        typeSound.currentTime = 0;
-        typeSound.play().catch(() => {});
-      }
+      /* typing sound (now unlocked) */
+      typeSound.currentTime = 0;
+      typeSound.play().catch(() => {});
 
       i++;
       setTimeout(type, 45);
@@ -211,10 +235,9 @@ function startTypewriter() {
   type();
 }
 
+/* ========= MUSIC FADES ========= */
 function fadeOutMusic() {
-  const bgMusic = document.getElementById("bgMusic");
-  if (!bgMusic) return;
-
+  const bgMusic = $("bgMusic");
   const f = setInterval(() => {
     if (bgMusic.volume > 0.05) bgMusic.volume -= 0.05;
     else { bgMusic.volume = 0; clearInterval(f); }
@@ -222,12 +245,11 @@ function fadeOutMusic() {
 }
 
 function fadeInMusic() {
-  const bgMusic = document.getElementById("bgMusic");
-  if (!bgMusic) return;
-
+  const bgMusic = $("bgMusic");
   const f = setInterval(() => {
     if (bgMusic.volume < 0.7) bgMusic.volume += 0.05;
     else { bgMusic.volume = 0.7; clearInterval(f); }
   }, 100);
 }
 </script>
+
