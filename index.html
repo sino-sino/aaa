@@ -2,241 +2,257 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>For You ❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You</title>
+
 <style>
-body {
+  body {
     margin: 0;
-    height: 100vh;
-    background: linear-gradient(135deg, #ffd6e8, #ffeef6);
     font-family: 'Segoe UI', sans-serif;
-    overflow: hidden;
+    background: linear-gradient(135deg, #fdeff2, #fff);
+    height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
-}
+    justify-content: center;
+    overflow: hidden;
+  }
 
-.container {
+  .card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
     text-align: center;
+    max-width: 340px;
+    position: relative;
     z-index: 2;
-}
+    animation: fadeIn 1s ease;
+  }
 
-h1 {
-    font-size: 2.5em;
-    color: #d63384;
-}
+  h1 {
+    color: #e91e63;
+    font-size: 22px;
+  }
 
-button {
-    padding: 15px 30px;
-    font-size: 1.2em;
+  p {
+    color: #555;
+    font-size: 16px;
+    margin: 20px 0;
+  }
+
+  button {
+    padding: 12px 22px;
     border: none;
-    border-radius: 30px;
+    border-radius: 25px;
+    font-size: 15px;
     cursor: pointer;
-    margin: 15px;
-}
+  }
 
-#yesBtn {
-    background: #ff4d88;
+  .yes {
+    background: #e91e63;
     color: white;
-}
+  }
 
-#noBtn {
-    background: #ccc;
+  .no {
+    background: #f8bbd0;
+    color: #880e4f;
     position: absolute;
-}
+  }
 
-#heartsImage {
-    position: absolute;
-    width: 300px;
-    opacity: 0;
-    transition: opacity 4s;
-    z-index: 1;
-}
+  .hidden {
+    display: none;
+  }
 
-.message-box {
-    font-size: 1.5em;
-    color: #b3005e;
-    width: 70%;
-    margin: 30px auto;
-    min-height: 60px;
-    line-height: 1.4em;
-    text-align: center;
-}
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-.heart {
-    position: absolute;
-    font-size: 20px;
-    animation: floatUp linear infinite;
-    opacity: 0.6;
-}
-
-@keyframes floatUp {
-    from { transform: translateY(100vh); opacity: 0; }
-    to { transform: translateY(-10vh); opacity: 1; }
-}
-
-.shake {
-    animation: shake 0.4s;
-}
-
-@keyframes shake {
+  @keyframes shake {
     0% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
     50% { transform: translateX(5px); }
     75% { transform: translateX(-5px); }
     100% { transform: translateX(0); }
-}
+  }
+
+  .shake {
+    animation: shake 0.4s;
+  }
+
+  .heart {
+    position: absolute;
+    bottom: -20px;
+    font-size: 20px;
+    animation: floatUp 6s linear infinite;
+    opacity: 0.7;
+  }
+
+  @keyframes floatUp {
+    from { transform: translateY(0); opacity: 0.7; }
+    to { transform: translateY(-110vh); opacity: 0; }
+  }
+
+  .confetti {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: pink;
+    animation: fall 3s linear forwards;
+  }
+
+  @keyframes fall {
+    to {
+      transform: translateY(100vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
 </style>
 </head>
+
 <body>
 
-<!-- START SCREEN -->
-<div class="container" id="startScreen">
-    <img src="start.png" style="width:300px; border-radius:20px;"><br><br>
-    <button onclick="startExperience()">Over here gorgeous 💕</button>
+<!-- STEP 1 -->
+<div class="card" id="step1">
+  <h1>✏️ EDIT THIS</h1>
+  <p>✏️ EDIT THIS</p>
+  <button class="yes" onclick="nextStep()">Continue</button>
 </div>
 
-<!-- MESSAGE SCREEN 1 -->
-<div class="container" id="stage1" style="display:none;">
-    <div class="message-box" id="message1"></div>
-    <button onclick="goToStage2()">Continue</button>
+<!-- STEP 2 -->
+<div class="card hidden" id="step2">
+  <h1>✏️ EDIT THIS</h1>
+  <p>✏️ EDIT THIS</p>
+  <button class="yes" onclick="nextStep2()">Continue</button>
 </div>
 
-<!-- MESSAGE SCREEN 2 -->
-<div class="container" id="stage2" style="display:none;">
-    <div class="message-box" id="message2"></div>
-    <button onclick="goToStage3()">Continue</button>
+<!-- STEP 3 -->
+<div class="card hidden" id="step3">
+  <h1>✏️ EDIT THIS</h1>
+  <p>✏️ EDIT THIS</p>
+  <button class="yes" onclick="finalStep()">Continue</button>
 </div>
 
-<!-- VALENTINE QUESTION -->
-<div class="container" id="stage3" style="display:none;">
-    <h1>Will you be my Valentine? 💖</h1>
-    <button id="yesBtn" onclick="yesClicked()">Yes 💕</button>
-    <button id="noBtn" onmouseover="noHover()">No</button>
+<!-- FINAL -->
+<div class="card hidden" id="final">
+  <h1>Will you be my Valentine? 💖</h1>
+  <p style="font-size:18px;"></p>
+  <button class="yes" onclick="yesAnswer()">Yes 💕</button>
+  <button class="no" id="noBtn">No</button>
 </div>
 
-<!-- YES SCREEN WITH TYPEWRITER -->
-<div class="container" id="stage4" style="display:none;">
-    <div class="message-box" id="text"></div>
-</div>
-
-<!-- HEART IMAGE -->
-<img id="heartsImage" src="hearts.png">
-
-<!-- AUDIO FILES -->
-<audio id="music" src="music.mp3" loop></audio>
-<audio id="typingSound" src="type.mp3"></audio>
+<!-- FLOATING HEARTS -->
+<div id="heartsContainer"></div>
 
 <script>
-const music = document.getElementById("music");
-const typingSound = document.getElementById("typingSound");
+const step1 = document.getElementById("step1");
+const step2 = document.getElementById("step2");
+const step3 = document.getElementById("step3");
+const final = document.getElementById("final");
+const noBtn = document.getElementById("noBtn");
 
-/* ========= START SCREEN FUNCTION ========= */
-function startExperience() {
-    document.getElementById("startScreen").style.display = "none";
-    document.getElementById("stage1").style.display = "block";
-    music.volume = 1;
-    music.play().catch(()=>{});
+/* ===== Steps Navigation ===== */
+function nextStep() {
+  step1.classList.add("hidden");
+  step2.classList.remove("hidden");
 }
 
-/* ========= FLOATING HEARTS ========= */
+function nextStep2() {
+  step2.classList.add("hidden");
+  step3.classList.remove("hidden");
+}
+
+function finalStep() {
+  step3.classList.add("hidden");
+  final.classList.remove("hidden");
+  placeNo();
+}
+
+/* ===== YES BUTTON ===== */
+function yesAnswer() {
+  confetti();
+  // typewriter message at the end, initially empty
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <h1>💖</h1>
+    <p id="typeMessage" style="font-size:18px;"></p>
+  `;
+  document.body.innerHTML = "";
+  document.body.appendChild(card);
+
+  typeWriter("typeMessage", "Type your final sweet message here…");
+}
+
+/* ===== TYPEWRITER FUNCTION ===== */
+function typeWriter(id, message) {
+  const el = document.getElementById(id);
+  let i = 0;
+  const interval = setInterval(() => {
+    el.innerHTML += message[i] || "";
+    i++;
+    if (i >= message.length) clearInterval(interval);
+  }, 80);
+}
+
+/* ===== NO BUTTON ===== */
+function placeNo() {
+  noBtn.style.left = "55%";
+  noBtn.style.top = "70%";
+}
+
+noBtn.addEventListener("mouseenter", () => {
+  const chance = Math.random();
+  if (chance < 0.7) {
+    // move away instantly
+    const x = Math.random() * 70;
+    const y = Math.random() * 70;
+    noBtn.style.left = x + "%";
+    noBtn.style.top = y + "%";
+  } else {
+    // shake
+    noBtn.classList.add("shake");
+    setTimeout(() => {
+      noBtn.classList.remove("shake");
+      // smooth move if clicked
+      noBtn.addEventListener('click', function handler() {
+        noBtn.removeEventListener('click', handler);
+        const dx = (Math.random()*50 - 25);
+        const dy = (Math.random()*50 - 25);
+        noBtn.style.transition = "all 0.3s ease";
+        noBtn.style.left = (noBtn.offsetLeft + dx) + "px";
+        noBtn.style.top = (noBtn.offsetTop + dy) + "px";
+        setTimeout(() => noBtn.style.transition = "", 300);
+      });
+    }, 400);
+  }
+});
+
+/* ===== FLOATING HEARTS ===== */
 setInterval(() => {
-    const h = document.createElement("div");
-    h.className = "heart";
-    h.innerHTML = "💗";
-    h.style.left = Math.random() * window.innerWidth + "px";
-    h.style.animationDuration = (3 + Math.random() * 3) + "s";
-    document.body.appendChild(h);
-    setTimeout(() => h.remove(), 6000);
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.innerHTML = "💗";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = (Math.random() * 10 + 15) + "px";
+  heart.style.animationDuration = (Math.random() * 3 + 4) + "s";
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 6000);
 }, 400);
 
-/* ========= MESSAGE NAVIGATION ========= */
-function goToStage2() {
-    document.getElementById("stage1").style.display = "none";
-    document.getElementById("stage2").style.display = "block";
-    document.getElementById("message2").textContent = ""; // ready for typing
-    typeMessage("message2", "This is where you can write your sweet message for stage 2…");
-}
-
-function goToStage3() {
-    document.getElementById("stage2").style.display = "none";
-    document.getElementById("stage3").style.display = "block";
-}
-
-/* ========= NO BUTTON BEHAVIOR ========= */
-function noHover() {
-    const noBtn = document.getElementById("noBtn");
-    const chance = Math.random();
-
-    if (chance < 0.7) {
-        // Moves away
-        const x = Math.random() * (window.innerWidth - 100);
-        const y = Math.random() * (window.innerHeight - 100);
-        noBtn.style.left = x + "px";
-        noBtn.style.top = y + "px";
-    } else {
-        // Tease: pause then small smooth move
-        noBtn.classList.add("shake");
-        setTimeout(() => {
-            noBtn.classList.remove("shake");
-            // Smooth move away if clicked
-            noBtn.addEventListener('click', function handler() {
-                noBtn.removeEventListener('click', handler);
-                const dx = (Math.random()*80 - 40);
-                const dy = (Math.random()*80 - 40);
-                noBtn.style.transition = "all 0.3s ease";
-                noBtn.style.left = (noBtn.offsetLeft + dx) + "px";
-                noBtn.style.top = (noBtn.offsetTop + dy) + "px";
-                setTimeout(() => noBtn.style.transition = "", 300);
-            });
-        }, 500);
-    }
-}
-
-/* ========= YES BUTTON ========= */
-function yesClicked() {
-    document.getElementById("stage3").style.display = "none";
-    document.getElementById("stage4").style.display = "block";
-
-    // Fade in hearts image
-    const img = document.getElementById("heartsImage");
-    img.style.opacity = 1;
-    img.style.left = "50%";
-    img.style.top = "50%";
-    img.style.transform = "translate(-50%, -50%)";
-
-    fadeMusic(1,0,1000); // fade out
-    setTimeout(() => typeMessage("text", ""), 200); // typing after 0.2s
-}
-
-/* ========= TYPEWRITER FUNCTION ========= */
-function typeMessage(elementId, message) {
-    const el = document.getElementById(elementId);
-    let i = 0;
-    typingSound.currentTime = 0;
-    typingSound.play().catch(()=>{});
-
-    const interval = setInterval(() => {
-        el.innerHTML += message[i] || "";
-        i++;
-        if (i >= message.length) {
-            clearInterval(interval);
-            typingSound.pause();
-            fadeMusic(0,1,3000);
-        }
-    }, 80);
-}
-
-/* ========= MUSIC FADE ========= */
-function fadeMusic(from, to, duration) {
-    let start = null;
-    function step(timestamp) {
-        if (!start) start = timestamp;
-        let progress = Math.min((timestamp - start)/duration,1);
-        music.volume = from + (to-from)*progress;
-        if(progress<1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
+/* ===== CONFETTI ===== */
+function confetti() {
+  for (let i = 0; i < 120; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.top = "-10px";
+    c.style.background = `hsl(${Math.random()*360}, 80%, 70%)`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 3000);
+  }
 }
 </script>
+
 </body>
 </html>
