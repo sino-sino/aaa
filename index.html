@@ -9,7 +9,7 @@
 /* ===== GLOBAL ===== */
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   background: linear-gradient(135deg, #fdeff2, #fff);
   height: 100vh;
   overflow: hidden;
@@ -27,20 +27,13 @@ body {
   opacity: 0;
   animation: floatUp linear forwards;
   pointer-events: none;
+  z-index: 1;
 }
 
 @keyframes floatUp {
-  0% {
-    transform: translateY(0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(-110vh);
-    opacity: 0;
-  }
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  100% { transform: translateY(-110vh); opacity: 0; }
 }
 
 /* ===== CARD ===== */
@@ -117,39 +110,89 @@ img {
 
 <body>
 
-<!-- STEP -->
 <div class="card" id="step1">
   <h1>✏️ EDIT THIS</h1>
   <p>✏️ EDIT THIS</p>
-  <button class="yes" onclick="goToQuestion()">Continue</button>
+  <button class="yes" id="continueBtn">Continue</button>
 </div>
 
-<!-- QUESTION -->
 <div class="card hidden" id="question">
   <h1>✏️ EDIT THIS</h1>
   <p>✏️ EDIT THIS</p>
-  <button class="yes" onclick="yesAnswer()">Yes 💕</button>
+  <button class="yes" id="yesBtn">Yes 💕</button>
   <button class="no" id="noBtn">No</button>
 </div>
 
-<!-- YES -->
 <div class="card hidden" id="yesCard">
   <h1>💖</h1>
   <p id="typewriter" class="cursor"></p>
   <img src="hearts.png" alt="Us">
 </div>
 
-<!-- AUDIO -->
 <audio id="bgMusic" src="music.mp3" loop></audio>
 <audio id="typeSound" src="type.mp3"></audio>
 
 <script>
+/* ===== ELEMENTS ===== */
+const step1 = document.getElementById("step1");
+const question = document.getElementById("question");
+const yesCard = document.getElementById("yesCard");
+
+const continueBtn = document.getElementById("continueBtn");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+
+const bgMusic = document.getElementById("bgMusic");
+const typeSound = document.getElementById("typeSound");
+
 /* ===== FLOATING HEARTS LOOP ===== */
 function createHeart() {
   const heart = document.createElement("div");
   heart.className = "heart";
   heart.innerHTML = "❤";
   heart.style.left = Math.random() * 100 + "vw";
-  heart.style.fontSize = Math.random()
+  heart.style.fontSize = Math.random() * 12 + 12 + "px";
+  heart.style.animationDuration = Math.random() * 3 + 4 + "s";
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 7000);
+}
+setInterval(createHeart, 400);
 
+/* ===== NAVIGATION ===== */
+continueBtn.onclick = () => {
+  step1.classList.add("hidden");
+  question.classList.remove("hidden");
+  noBtn.style.left = "55%";
+  noBtn.style.top = "70%";
+};
 
+yesBtn.onclick = () => {
+  question.classList.add("hidden");
+  yesCard.classList.remove("hidden");
+  bgMusic.volume = 0.7;
+  bgMusic.play().then(startTypewriter);
+};
+
+/* ===== NO BUTTON ===== */
+/* 70% shake, 30% move */
+function noReaction() {
+  if (Math.random() < 0.7) {
+    noBtn.classList.add("shake");
+    setTimeout(() => noBtn.classList.remove("shake"), 400);
+  } else {
+    noBtn.style.left = Math.random() * 70 + "%";
+    noBtn.style.top = Math.random() * 70 + "%";
+  }
+}
+noBtn.addEventListener("mouseenter", noReaction);
+noBtn.addEventListener("click", noReaction);
+
+/* ===== TYPEWRITER ===== */
+const message = "✏️ EDIT THIS — write something real.";
+
+function fadeOutMusic() {
+  const i = setInterval(() => {
+    if (bgMusic.volume > 0.05) bgMusic.volume -= 0.05;
+    else { bgMusic.volume = 0; clearInterval(i); }
+  }, 100);
+}
