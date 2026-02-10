@@ -131,43 +131,103 @@ img {
 <audio id="typeSound" src="type.mp3"></audio>
 
 <script>
-/* ELEMENTS */
-const step1 = document.getElementById("step1");
-const question = document.getElementById("question");
-const yesCard = document.getElementById("yesCard");
-const noBtn = document.getElementById("noBtn");
+/* ===== SAFE GLOBAL FUNCTIONS ===== */
+window.goToQuestion = function () {
+  document.getElementById("step1").classList.add("hidden");
+  document.getElementById("question").classList.remove("hidden");
 
-const bgMusic = document.getElementById("bgMusic");
-const typeSound = document.getElementById("typeSound");
-
-/* FLOATING HEARTS */
-setInterval(() => {
-  const h = document.createElement("div");
-  h.className = "heart";
-  h.textContent = "❤";
-  h.style.left = Math.random() * 100 + "vw";
-  h.style.fontSize = Math.random() * 12 + 12 + "px";
-  h.style.animationDuration = Math.random() * 3 + 4 + "s";
-  document.body.appendChild(h);
-  setTimeout(() => h.remove(), 7000);
-}, 400);
-
-/* NAVIGATION */
-function goToQuestion() {
-  step1.classList.add("hidden");
-  question.classList.remove("hidden");
+  const noBtn = document.getElementById("noBtn");
   noBtn.style.left = "55%";
   noBtn.style.top = "70%";
-}
+};
 
-function yesAnswer() {
-  question.classList.add("hidden");
-  yesCard.classList.remove("hidden");
-  bgMusic.volume = 0.7;
-  bgMusic.play().then(startTypewriter);
-}
+window.yesAnswer = function () {
+  document.getElementById("question").classList.add("hidden");
+  document.getElementById("yesCard").classList.remove("hidden");
 
-/* NO BUTTON — 70% SHAKE */
-function noReaction() {
+  const bgMusic = document.getElementById("bgMusic");
+
+  if (bgMusic) {
+    bgMusic.volume = 0.7;
+    bgMusic.play().catch(() => {});
+  }
+
+  startTypewriter();
+};
+
+window.noReaction = function () {
+  const noBtn = document.getElementById("noBtn");
+
   if (Math.random() < 0.7) {
     noBtn.classList.add("shake");
+    setTimeout(() => noBtn.classList.remove("shake"), 400);
+  } else {
+    noBtn.style.left = Math.random() * 70 + "%";
+    noBtn.style.top = Math.random() * 70 + "%";
+  }
+};
+
+/* ===== FLOATING HEARTS ===== */
+setInterval(() => {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.textContent = "❤";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = Math.random() * 12 + 12 + "px";
+  heart.style.animationDuration = Math.random() * 3 + 4 + "s";
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 7000);
+}, 400);
+
+/* ===== TYPEWRITER ===== */
+const message = "✏️ EDIT THIS — something real.";
+
+function startTypewriter() {
+  const el = document.getElementById("typewriter");
+  const typeSound = document.getElementById("typeSound");
+  const bgMusic = document.getElementById("bgMusic");
+
+  let i = 0;
+
+  fadeOutMusic();
+
+  function type() {
+    if (i < message.length) {
+      el.textContent += message.charAt(i);
+
+      if (typeSound) {
+        typeSound.currentTime = 0;
+        typeSound.play().catch(() => {});
+      }
+
+      i++;
+      setTimeout(type, 45);
+    } else {
+      el.classList.remove("cursor");
+      setTimeout(fadeInMusic, 2000);
+    }
+  }
+
+  type();
+}
+
+function fadeOutMusic() {
+  const bgMusic = document.getElementById("bgMusic");
+  if (!bgMusic) return;
+
+  const f = setInterval(() => {
+    if (bgMusic.volume > 0.05) bgMusic.volume -= 0.05;
+    else { bgMusic.volume = 0; clearInterval(f); }
+  }, 100);
+}
+
+function fadeInMusic() {
+  const bgMusic = document.getElementById("bgMusic");
+  if (!bgMusic) return;
+
+  const f = setInterval(() => {
+    if (bgMusic.volume < 0.7) bgMusic.volume += 0.05;
+    else { bgMusic.volume = 0.7; clearInterval(f); }
+  }, 100);
+}
+</script>
