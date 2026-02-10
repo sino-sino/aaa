@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>For You ❤️</title>
-
 <style>
 body {
     margin: 0;
@@ -53,11 +52,14 @@ button {
     z-index: 1;
 }
 
-.typewriter {
-    font-size: 1.6em;
+.message-box {
+    font-size: 1.5em;
     color: #b3005e;
-    width: 80%;
-    margin: auto;
+    width: 70%;
+    margin: 30px auto;
+    min-height: 60px;
+    line-height: 1.4em;
+    text-align: center;
 }
 
 .heart {
@@ -68,14 +70,8 @@ button {
 }
 
 @keyframes floatUp {
-    from {
-        transform: translateY(100vh);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(-10vh);
-        opacity: 1;
-    }
+    from { transform: translateY(100vh); opacity: 0; }
+    to { transform: translateY(-10vh); opacity: 1; }
 }
 
 .shake {
@@ -91,7 +87,6 @@ button {
 }
 </style>
 </head>
-
 <body>
 
 <!-- START SCREEN -->
@@ -100,22 +95,28 @@ button {
     <button onclick="startExperience()">Over here gorgeous 💕</button>
 </div>
 
-<!-- FIRST MESSAGE SCREEN -->
+<!-- MESSAGE SCREEN 1 -->
 <div class="container" id="stage1" style="display:none;">
-    <h1>Hey… I made something for you 💕</h1>
-    <button onclick="goToQuestion()">Continue</button>
+    <div class="message-box" id="message1"></div>
+    <button onclick="goToStage2()">Continue</button>
+</div>
+
+<!-- MESSAGE SCREEN 2 -->
+<div class="container" id="stage2" style="display:none;">
+    <div class="message-box" id="message2"></div>
+    <button onclick="goToStage3()">Continue</button>
 </div>
 
 <!-- VALENTINE QUESTION -->
-<div class="container" id="stage2" style="display:none;">
+<div class="container" id="stage3" style="display:none;">
     <h1>Will you be my Valentine? 💖</h1>
     <button id="yesBtn" onclick="yesClicked()">Yes 💕</button>
-    <button id="noBtn" onmouseover="noHover()">No 🙃</button>
+    <button id="noBtn" onmouseover="noHover()">No</button>
 </div>
 
 <!-- YES SCREEN WITH TYPEWRITER -->
-<div class="container" id="stage3" style="display:none;">
-    <div class="typewriter" id="text"></div>
+<div class="container" id="stage4" style="display:none;">
+    <div class="message-box" id="text"></div>
 </div>
 
 <!-- HEART IMAGE -->
@@ -148,19 +149,24 @@ setInterval(() => {
     setTimeout(() => h.remove(), 6000);
 }, 400);
 
-/* ========= NAVIGATION ========= */
-function goToQuestion() {
+/* ========= MESSAGE NAVIGATION ========= */
+function goToStage2() {
     document.getElementById("stage1").style.display = "none";
     document.getElementById("stage2").style.display = "block";
-    const noBtn = document.getElementById("noBtn");
-    noBtn.style.left = "55%";
-    noBtn.style.top = "70%";
+    document.getElementById("message2").textContent = ""; // ready for typing
+    typeMessage("message2", "This is where you can write your sweet message for stage 2…");
+}
+
+function goToStage3() {
+    document.getElementById("stage2").style.display = "none";
+    document.getElementById("stage3").style.display = "block";
 }
 
 /* ========= NO BUTTON BEHAVIOR ========= */
 function noHover() {
     const noBtn = document.getElementById("noBtn");
     const chance = Math.random();
+
     if (chance < 0.7) {
         // Moves away
         const x = Math.random() * (window.innerWidth - 100);
@@ -168,20 +174,28 @@ function noHover() {
         noBtn.style.left = x + "px";
         noBtn.style.top = y + "px";
     } else {
-        // Tease: pause then small random move
+        // Tease: pause then small smooth move
         noBtn.classList.add("shake");
         setTimeout(() => {
             noBtn.classList.remove("shake");
-            noBtn.style.left = (noBtn.offsetLeft + (Math.random()*80 - 40)) + "px";
-            noBtn.style.top = (noBtn.offsetTop + (Math.random()*80 - 40)) + "px";
+            // Smooth move away if clicked
+            noBtn.addEventListener('click', function handler() {
+                noBtn.removeEventListener('click', handler);
+                const dx = (Math.random()*80 - 40);
+                const dy = (Math.random()*80 - 40);
+                noBtn.style.transition = "all 0.3s ease";
+                noBtn.style.left = (noBtn.offsetLeft + dx) + "px";
+                noBtn.style.top = (noBtn.offsetTop + dy) + "px";
+                setTimeout(() => noBtn.style.transition = "", 300);
+            });
         }, 500);
     }
 }
 
 /* ========= YES BUTTON ========= */
 function yesClicked() {
-    document.getElementById("stage2").style.display = "none";
-    document.getElementById("stage3").style.display = "block";
+    document.getElementById("stage3").style.display = "none";
+    document.getElementById("stage4").style.display = "block";
 
     // Fade in hearts image
     const img = document.getElementById("heartsImage");
@@ -191,20 +205,18 @@ function yesClicked() {
     img.style.transform = "translate(-50%, -50%)";
 
     fadeMusic(1,0,1000); // fade out
-    setTimeout(typeText, 200); // typing after 0.2s
+    setTimeout(() => typeMessage("text", ""), 200); // typing after 0.2s
 }
 
-/* ========= TYPEWRITER ========= */
-function typeText() {
-    const message = "You make my world softer, brighter, and warmer. I wanted this to be special… just like you 💗";
+/* ========= TYPEWRITER FUNCTION ========= */
+function typeMessage(elementId, message) {
+    const el = document.getElementById(elementId);
     let i = 0;
-    const textEl = document.getElementById("text");
-
     typingSound.currentTime = 0;
     typingSound.play().catch(()=>{});
 
     const interval = setInterval(() => {
-        textEl.innerHTML += message[i];
+        el.innerHTML += message[i] || "";
         i++;
         if (i >= message.length) {
             clearInterval(interval);
@@ -226,6 +238,5 @@ function fadeMusic(from, to, duration) {
     requestAnimationFrame(step);
 }
 </script>
-
 </body>
 </html>
