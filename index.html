@@ -15,6 +15,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    position: relative;
   }
 
   .card {
@@ -107,10 +108,33 @@
       opacity: 0;
     }
   }
+
+  #startImage, #endHearts {
+    position: absolute;
+    max-width: 300px;
+    border-radius: 20px;
+    z-index: 1;
+  }
+
+  #startImage {
+    top: 20px;
+  }
+
+  #endHearts {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 3s;
+    z-index: 1;
+  }
 </style>
 </head>
 
 <body>
+
+<!-- START IMAGE -->
+<img id="startImage" src="start.png">
 
 <!-- STEP 1 -->
 <div class="card" id="step1">
@@ -141,8 +165,12 @@
   <button class="no" id="noBtn">No</button>
 </div>
 
-<!-- FLOATING HEARTS -->
-<div id="heartsContainer"></div>
+<!-- END HEARTS IMAGE -->
+<img id="endHearts" src="hearts.png">
+
+<!-- AUDIO -->
+<audio id="music" src="music.mp3" loop></audio>
+<audio id="typingSound" src="type.mp3"></audio>
 
 <script>
 const step1 = document.getElementById("step1");
@@ -150,6 +178,15 @@ const step2 = document.getElementById("step2");
 const step3 = document.getElementById("step3");
 const final = document.getElementById("final");
 const noBtn = document.getElementById("noBtn");
+const music = document.getElementById("music");
+const typingSound = document.getElementById("typingSound");
+const endHearts = document.getElementById("endHearts");
+const startImage = document.getElementById("startImage");
+
+/* ===== PLAY MUSIC ON FIRST BUTTON CLICK ===== */
+step1.querySelector('button').addEventListener("click", () => {
+  music.play().catch(()=>{});
+});
 
 /* ===== Steps Navigation ===== */
 function nextStep() {
@@ -168,20 +205,25 @@ function finalStep() {
   placeNo();
 }
 
-/* ===== YES BUTTON ===== */
+/* ===== YES BUTTON AT END ===== */
 function yesAnswer() {
   confetti();
-  // typewriter message at the end, initially empty
+  final.style.display = "none";
+  endHearts.style.opacity = 1;
+
   const card = document.createElement("div");
   card.className = "card";
   card.innerHTML = `
     <h1>💖</h1>
     <p id="typeMessage" style="font-size:18px;"></p>
   `;
-  document.body.innerHTML = "";
   document.body.appendChild(card);
 
-  typeWriter("typeMessage", "Type your final sweet message here…");
+  // Typewriter sound
+  typingSound.currentTime = 0;
+  typingSound.play().catch(()=>{});
+
+  typeWriter("typeMessage", ""); // empty initially for your custom message
 }
 
 /* ===== TYPEWRITER FUNCTION ===== */
@@ -191,7 +233,10 @@ function typeWriter(id, message) {
   const interval = setInterval(() => {
     el.innerHTML += message[i] || "";
     i++;
-    if (i >= message.length) clearInterval(interval);
+    if (i >= message.length) {
+      clearInterval(interval);
+      typingSound.pause();
+    }
   }, 80);
 }
 
@@ -204,17 +249,14 @@ function placeNo() {
 noBtn.addEventListener("mouseenter", () => {
   const chance = Math.random();
   if (chance < 0.7) {
-    // move away instantly
     const x = Math.random() * 70;
     const y = Math.random() * 70;
     noBtn.style.left = x + "%";
     noBtn.style.top = y + "%";
   } else {
-    // shake
     noBtn.classList.add("shake");
     setTimeout(() => {
       noBtn.classList.remove("shake");
-      // smooth move if clicked
       noBtn.addEventListener('click', function handler() {
         noBtn.removeEventListener('click', handler);
         const dx = (Math.random()*50 - 25);
