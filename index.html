@@ -6,7 +6,6 @@
 <title>For You</title>
 
 <style>
-/* ===== GLOBAL ===== */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
@@ -18,12 +17,11 @@ body {
   justify-content: center;
 }
 
-/* ===== FLOATING HEARTS BACKGROUND ===== */
+/* FLOATING HEARTS */
 .heart {
   position: absolute;
   bottom: -20px;
   color: #e91e63;
-  font-size: 16px;
   opacity: 0;
   animation: floatUp linear forwards;
   pointer-events: none;
@@ -36,7 +34,7 @@ body {
   100% { transform: translateY(-110vh); opacity: 0; }
 }
 
-/* ===== CARD ===== */
+/* CARD */
 .card {
   background: white;
   padding: 30px;
@@ -49,7 +47,7 @@ body {
 
 .hidden { display: none; }
 
-/* ===== BUTTONS ===== */
+/* BUTTONS */
 button {
   padding: 12px 22px;
   border: none;
@@ -70,7 +68,7 @@ button {
   transition: left 0.3s ease, top 0.3s ease;
 }
 
-/* ===== SHAKE ===== */
+/* SHAKE */
 .shake {
   animation: shake 0.4s;
 }
@@ -83,7 +81,7 @@ button {
   100% { transform: translateX(0); }
 }
 
-/* ===== IMAGE (DO NOT TOUCH) ===== */
+/* IMAGE — DO NOT TOUCH */
 img {
   width: 100%;
   border-radius: 15px;
@@ -96,7 +94,7 @@ img {
   to { opacity: 1; }
 }
 
-/* ===== TYPEWRITER ===== */
+/* TYPEWRITER */
 .cursor::after {
   content: "|";
   animation: blink 1s infinite;
@@ -113,14 +111,14 @@ img {
 <div class="card" id="step1">
   <h1>✏️ EDIT THIS</h1>
   <p>✏️ EDIT THIS</p>
-  <button class="yes" id="continueBtn">Continue</button>
+  <button class="yes" onclick="goToQuestion()">Continue</button>
 </div>
 
 <div class="card hidden" id="question">
   <h1>✏️ EDIT THIS</h1>
   <p>✏️ EDIT THIS</p>
-  <button class="yes" id="yesBtn">Yes 💕</button>
-  <button class="no" id="noBtn">No</button>
+  <button class="yes" onclick="yesAnswer()">Yes 💕</button>
+  <button class="no" id="noBtn" onclick="noReaction()">No</button>
 </div>
 
 <div class="card hidden" id="yesCard">
@@ -133,66 +131,43 @@ img {
 <audio id="typeSound" src="type.mp3"></audio>
 
 <script>
-/* ===== ELEMENTS ===== */
+/* ELEMENTS */
 const step1 = document.getElementById("step1");
 const question = document.getElementById("question");
 const yesCard = document.getElementById("yesCard");
-
-const continueBtn = document.getElementById("continueBtn");
-const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
 
 const bgMusic = document.getElementById("bgMusic");
 const typeSound = document.getElementById("typeSound");
 
-/* ===== FLOATING HEARTS LOOP ===== */
-function createHeart() {
-  const heart = document.createElement("div");
-  heart.className = "heart";
-  heart.innerHTML = "❤";
-  heart.style.left = Math.random() * 100 + "vw";
-  heart.style.fontSize = Math.random() * 12 + 12 + "px";
-  heart.style.animationDuration = Math.random() * 3 + 4 + "s";
-  document.body.appendChild(heart);
-  setTimeout(() => heart.remove(), 7000);
-}
-setInterval(createHeart, 400);
+/* FLOATING HEARTS */
+setInterval(() => {
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.textContent = "❤";
+  h.style.left = Math.random() * 100 + "vw";
+  h.style.fontSize = Math.random() * 12 + 12 + "px";
+  h.style.animationDuration = Math.random() * 3 + 4 + "s";
+  document.body.appendChild(h);
+  setTimeout(() => h.remove(), 7000);
+}, 400);
 
-/* ===== NAVIGATION ===== */
-continueBtn.onclick = () => {
+/* NAVIGATION */
+function goToQuestion() {
   step1.classList.add("hidden");
   question.classList.remove("hidden");
   noBtn.style.left = "55%";
   noBtn.style.top = "70%";
-};
+}
 
-yesBtn.onclick = () => {
+function yesAnswer() {
   question.classList.add("hidden");
   yesCard.classList.remove("hidden");
   bgMusic.volume = 0.7;
   bgMusic.play().then(startTypewriter);
-};
+}
 
-/* ===== NO BUTTON ===== */
-/* 70% shake, 30% move */
+/* NO BUTTON — 70% SHAKE */
 function noReaction() {
   if (Math.random() < 0.7) {
     noBtn.classList.add("shake");
-    setTimeout(() => noBtn.classList.remove("shake"), 400);
-  } else {
-    noBtn.style.left = Math.random() * 70 + "%";
-    noBtn.style.top = Math.random() * 70 + "%";
-  }
-}
-noBtn.addEventListener("mouseenter", noReaction);
-noBtn.addEventListener("click", noReaction);
-
-/* ===== TYPEWRITER ===== */
-const message = "✏️ EDIT THIS — write something real.";
-
-function fadeOutMusic() {
-  const i = setInterval(() => {
-    if (bgMusic.volume > 0.05) bgMusic.volume -= 0.05;
-    else { bgMusic.volume = 0; clearInterval(i); }
-  }, 100);
-}
