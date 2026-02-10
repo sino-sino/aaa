@@ -65,12 +65,27 @@
     width: 100%;
     border-radius: 15px;
     margin-top: 20px;
-    animation: fadeIn 1.5s ease;
+    opacity: 0;
+    animation: fadeImage 3s ease forwards;
+    animation-delay: 1s;
+  }
+
+  .cursor::after {
+    content: "|";
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
   }
 
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeImage {
+    to { opacity: 1; }
   }
 </style>
 </head>
@@ -91,7 +106,7 @@
   <button class="yes" onclick="finalStep()">Tap here</button>
 </div>
 
-<!-- FINAL QUESTION -->
+<!-- QUESTION -->
 <div class="card hidden" id="final">
   <h1>✏️ EDIT THIS</h1>
   <p style="font-size:18px;">✏️ EDIT THIS</p>
@@ -102,13 +117,18 @@
 <!-- YES RESULT -->
 <div class="card hidden" id="yesCard">
   <h1>💖</h1>
-  <p style="font-size:18px;">✏️ EDIT THIS</p>
-
-  <!-- IMAGE APPEARS ONLY HERE -->
+  <p id="typewriter" class="cursor"></p>
   <img src="hearts.png" alt="Us">
 </div>
 
+<!-- AUDIO -->
+<audio id="bgMusic" src="music.mp3" loop></audio>
+<audio id="typeSound" src="type.mp3"></audio>
+
 <script>
+  const bgMusic = document.getElementById("bgMusic");
+  const typeSound = document.getElementById("typeSound");
+
   function nextStep() {
     step1.classList.add("hidden");
     step2.classList.remove("hidden");
@@ -124,6 +144,11 @@
   function yesAnswer() {
     final.classList.add("hidden");
     yesCard.classList.remove("hidden");
+
+    bgMusic.volume = 0.7;
+    bgMusic.play();
+
+    startTypewriter();
   }
 
   const noBtn = document.getElementById("noBtn");
@@ -132,7 +157,56 @@
     noBtn.style.left = Math.random() * 70 + "%";
     noBtn.style.top = Math.random() * 70 + "%";
   });
+
+  /* ✏️ EDIT THIS MESSAGE */
+  const message =
+    "✏️ EDIT THIS – One honest sentence. No emojis.";
+
+  function fadeOutMusic() {
+    const fade = setInterval(() => {
+      if (bgMusic.volume > 0.05) {
+        bgMusic.volume -= 0.05;
+      } else {
+        bgMusic.volume = 0;
+        clearInterval(fade);
+      }
+    }, 100);
+  }
+
+  function fadeInMusic() {
+    const fade = setInterval(() => {
+      if (bgMusic.volume < 0.7) {
+        bgMusic.volume += 0.05;
+      } else {
+        bgMusic.volume = 0.7;
+        clearInterval(fade);
+      }
+    }, 100);
+  }
+
+  function startTypewriter() {
+    const el = document.getElementById("typewriter");
+    let i = 0;
+
+    fadeOutMusic();
+
+    function type() {
+      if (i < message.length) {
+        el.textContent += message.charAt(i);
+        typeSound.currentTime = 0;
+        typeSound.play();
+        i++;
+        setTimeout(type, 45);
+      } else {
+        el.classList.remove("cursor");
+        setTimeout(fadeInMusic, 2000);
+      }
+    }
+
+    type();
+  }
 </script>
 
 </body>
 </html>
+
